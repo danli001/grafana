@@ -9,6 +9,11 @@ import (
 	"github.com/grafana/grafana/pkg/plugins"
 )
 
+const (
+	floatMin = 0.000001
+	covMax   = math.MaxFloat64
+)
+
 // queryReducer reduces a timeseries to a nullable float
 type queryReducer struct {
 
@@ -95,6 +100,38 @@ func (s *queryReducer) Reduce(series plugins.DataTimeSeries) null.Float {
 			} else {
 				value = (values[(length/2)-1] + values[length/2]) / 2
 			}
+		}
+	case "cov":
+		var values []float64
+		for _, v := range series.Points {
+			if isValid(v[0]) {
+				allNull = false
+				values = append(values, v[0].Float64)
+			}
+		}
+
+		isEqual := func(f1, f2 float64) bool {
+			if f1 > f2 {
+				return math.Dim(f1, f2) < floatMin
+			} else {
+				return math.Dim(f2, f1) < floatMin
+			}
+		}
+
+		var sum, average, variance, stddev float64
+		for _, v := range values {
+			sum += v
+		}
+		average = sum / float64(len(values))
+		for _, v := range values {
+			variance += math.Pow(v-average, 2)
+		}
+		stddev = math.Sqrt(variance / float64(len(values)))
+
+		if isEqual(average, 0.0) {
+			value = covMax
+		} else {
+			value = math.Abs(stddev/average) * 100
 		}
 	case "diff":
 		allNull, value = calculateDiff(series, allNull, value, diff)

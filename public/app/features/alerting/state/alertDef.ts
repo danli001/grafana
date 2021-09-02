@@ -56,6 +56,7 @@ const reducerTypes = [
   { text: 'count()', value: 'count' },
   { text: 'last()', value: 'last' },
   { text: 'median()', value: 'median' },
+  { text: 'cov()', value: 'cov' },
   { text: 'diff()', value: 'diff' },
   { text: 'diff_abs()', value: 'diff_abs' },
   { text: 'percent_diff()', value: 'percent_diff' },
