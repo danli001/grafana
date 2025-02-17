@@ -4833,7 +4833,6 @@
    "type": "object"
   },
   "receiver": {
-   "description": "Receiver receiver",
    "properties": {
     "active": {
      "description": "active",
